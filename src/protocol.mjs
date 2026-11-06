@@ -180,10 +180,11 @@ function parseToolCommand(text, tools) {
   if (Object.hasOwn(parsed, 'arguments') && (!parsed.arguments || typeof parsed.arguments !== 'object' || Array.isArray(parsed.arguments))) {
     return invalid('`arguments` must be an object');
   }
+  if (Object.hasOwn(parsed, 'say') && typeof parsed.say !== 'string') return invalid('`say` must be a string');
   if (!tools.some((tool) => tool.name === parsed.tool)) {
     return { content: `Unknown tool \`${parsed.tool}\`. Send \`tools\` to list available tools.` };
   }
-  return { toolCall: { id: `dummyplug-${randomUUID()}`, type: 'function', function: {
+  return { say: parsed.say || null, toolCall: { id: `dummyplug-${randomUUID()}`, type: 'function', function: {
     name: parsed.tool,
     arguments: JSON.stringify(parsed.arguments ?? {}),
   } } };
@@ -203,7 +204,7 @@ export function complete(messages, toolDefinitions) {
   if (exactTool) return { role: 'assistant', content: toolSample(exactTool) };
   if (text.startsWith('{')) {
     const parsed = parseToolCommand(text, tools);
-    if (parsed.toolCall) return { role: 'assistant', content: null, tool_calls: [parsed.toolCall] };
+    if (parsed.toolCall) return { role: 'assistant', content: parsed.say, tool_calls: [parsed.toolCall] };
     return { role: 'assistant', content: parsed.content };
   }
   return { role: 'assistant', content: lorem() };

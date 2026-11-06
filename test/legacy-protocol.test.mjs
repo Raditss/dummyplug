@@ -66,3 +66,15 @@ test('ordinary text has the documented lorem response shape', () => {
     }
   }
 });
+
+test('say writes text in the same message as the tool call (spec 053)', () => {
+  const message = complete([{ role: 'user', content: '{"say":"checking first","tool":"echo","arguments":{"text":"hi"}}' }], [functionTool()]);
+  assert.equal(message.content, 'checking first');
+  assert.equal(message.tool_calls.length, 1);
+  assert.equal(message.tool_calls[0].function.name, 'echo');
+});
+
+test('an empty say is the same as none, and a non-string say is a text reply', () => {
+  assert.equal(complete([{ role: 'user', content: '{"say":"","tool":"echo"}' }], [functionTool()]).content, null);
+  assert.match(complete([{ role: 'user', content: '{"say":1,"tool":"echo"}' }], [functionTool()]).content, /^Invalid tool request: `say` must be a string/u);
+});

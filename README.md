@@ -54,4 +54,4 @@ docker run --rm -p 9998:9998 dummyplug
 - `GET /v1/models`
 - `POST /v1/chat/completions`, returning JSON or server-sent events when `stream: true`
 
-The server accepts any model string and does not require an API key. It preserves the legacy `tools`, `context`, exact tool name, JSON tool request, trailing tool-result echo, and lorem response behavior. Responses report zero usage. Scenario injection, request capture, and test-control routes belong in the caller's test harness; this service has no persistent request state.
+The server accepts any model string and does not require an API key. It preserves the legacy `tools`, `context`, exact tool name, JSON tool request, trailing tool-result echo, and lorem response behavior. A JSON tool request may add `"say": "text"`, which is returned as the message text beside the tool call (a mid-turn message). Responses report zero usage. Scenario injection, request capture, and test-control routes belong in the caller's test harness; this service has no persistent request state.
